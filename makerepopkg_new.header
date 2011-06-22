@@ -1,0 +1,75 @@
+function buildDepend()
+Arguments:
+Returns  :
+
+function checkDepend()
+Arguments: dependency
+Returns  : 5 - installed, 6 - in repository, 7 - in AUR
+
+function checkPKGBIULD()
+Arguments:
+Returns  : 0 - valid, 1 - $startdir is used, 2 - $install is array
+
+function checkProfile()
+Arguments: profile-name
+Returns  : 0 - valid profile, 1 - not valid profile
+
+function cleanup()
+Arguments:
+Returns  :
+
+function copyPkg()
+Arguments:
+Returns  :
+
+function debug()
+Arguments: debug-text (echo -e conform), needed numeric debug-level
+Returns  : return-status set before debug()-function called
+
+function getDepends()
+Arguments: 
+Returns  :
+
+function getProfiles()
+Arguments: 
+Returns  : list of profiles (echo conform)
+
+function listDepends()
+Arguments:
+Returns  : 0 - all dependencies are installed, 1 - some dependencies are missing but all in repository, 2 - some dependencies are missing and only in AUR, 3 - some dependencies have unknown status
+
+function listProfiles()
+Arguments: (bool)validcheck
+Returns  : list of profiles
+
+function loadProfile()
+Arguments: profile-name
+Returns  :
+
+function makePkg()
+Arguments: profile-name
+Returns  :
+
+function removeProfile()
+Arguments: profile-name
+Returns  :
+
+function showProfile()
+Arguments: profile-name
+Returns  : 1 - not shown, either profile doesn't exist or not valid
+
+function usage()
+Arguments:
+Returns  :
+
+function usageD()
+Arguments:
+Returns  :
+
+function usageP()
+Arguments:
+Returns  :
+
+function writeProfile()
+Arguments: profile-name, profile-architecture, profile-chroot-directory, profile-use-chroot-environment, profile-temporary-files-directory, profile-debug-level, profile-repository-directory, profile-repository-name, profile-use-symlink
+Returns  :
