@@ -3,9 +3,13 @@ Andrwes Scripting Center
 This is the git-repository for all scripts I'm working on.
 
 
-__makerepopkg_new.sh__
+__makerepopkg.sh__
 
 Script for managing package compilation and repositories in Arch Linux.
+
+__makerepopkg.header__
+
+Description of functions used in makerepopkg.sh
 
 __privoxy-blocklist.sh__
 
