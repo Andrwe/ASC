@@ -1,3 +1,12 @@
 Andrwes Scripting Center
 
 This is the git-repository for all scripts I'm working on.
+
+
+__makerepopkg_new.sh__
+
+Script for managing package compilation and repositories in Arch Linux.
+
+__privoxy-blocklist.sh__
+
+Script for converting AdBlock Plus lists to privoxy lists.
