@@ -4,8 +4,8 @@
 #
 #                  Author: Andrwe Lord Weber
 #                  Mail: lord-weber-andrwe<at>renona-studios<dot>org
-#                  Version: 0.3
-#                  URL: http://andrwe.dyndns.org/doku.php/scripting/bash/privoxy-blocklist
+#                  Version: 0.2
+#                  URL: http://andrwe.dyndns.org/doku.php/blog/scripting/bash/privoxy-blocklist
 #
 ##################
 #
@@ -36,7 +36,7 @@ URLS=("https://easylist-downloads.adblockplus.org/easylist.txt" "https://easylis
 # privoxy config dir (default: /etc/privoxy/)
 CONFDIR=/etc/privoxy
 # directory for temporary files
-TMPDIR=/tmp/privoxy-blocklist
+TMPDIR=/tmp/privoxy-blocklist-test
 TMPNAME=$(basename ${0})
 
 ######################################################################
@@ -70,18 +70,36 @@ function debug()
 	[ ${DBG} -ge ${2} ] && echo -e "${1}"
 }
 
+function escapeLine()
+{
+	local pline="$1"
+	pline="${pline//./\.}"
+	pline="${pline//\?/\?}"
+	pline="${pline//\*/\*}"
+	pline="${pline//(/\(}"
+	pline="${pline//)/\)}"
+	pline="${pline//[/\[}"
+	pline="${pline//]/\]}"
+	pline="${pline//\^/[\/\&:\?=_]}"
+	pline="${pline/||/\.}"
+	pline="${pline/|/^}"
+	pline="${pline/%|/\$}"
+	echo "$pline"
+}
 function main()
 {
-	cpoptions=""
+	local cpoptions=""
 	[ ${DBG} -gt 0 ] && cpoptions="-v"
 
 	for url in ${URLS[@]}
 	do
 		debug "Processing ${url} ...\n" 0
-		file=${TMPDIR}/$(basename ${url})
-		actionfile=${file%\.*}.script.action
-		filterfile=${file%\.*}.script.filter
-		list=$(basename ${file%\.*})
+		local file=${TMPDIR}/$(basename ${url})
+		local actionfile=${file%\.*}.script.action
+		local whitefile=${file%\.*}.script.white
+		local whiteimgfile=${file%\.*}.script.whiteimg
+		local filterfile=${file%\.*}.script.filter
+		local list=$(basename ${file%\.*})
 	
 		# download list
 		debug "Downloading ${url} ..." 0
@@ -90,19 +108,114 @@ function main()
 		debug ".. downloading done." 0
 		[ "$(grep -E '^\[Adblock.*\]$' ${file})" == "" ] && echo "The list recieved from ${url} isn't an AdblockPlus list. Skipped" && continue
 	
-		# convert AdblockPlus list to Privoxy list
+		local line pline wline pfile
 		# blacklist of urls
 		debug "Creating actionfile for ${list} ..." 1
 		echo -e "{ +block{${list}} }" > ${actionfile}
-		sed '/^!.*/d;1,1 d;/^@@.*/d;/\$.*/d;/#/d;s/\./\\./g;s/\?/\\?/g;s/\*/.*/g;s/(/\\(/g;s/)/\\)/g;s/\[/\\[/g;s/\]/\\]/g;s/\^/[\/\&:\?=_]/g;s/^||/\./g;s/^|/^/g;s/|$/\$/g;/|/d' ${file} >> ${actionfile}
 		debug "... creating filterfile for ${list} ..." 1
 		echo "FILTER: ${list} Tag filter of ${list}" > ${filterfile}
-		# set filter for html elements
-		sed '/^#/!d;s/^##//g;s/^#\(.*\)\[.*\]\[.*\]*/s|<([a-zA-Z0-9]+)\\s+.*id=.?\1.*>.*<\/\\1>||g/g;s/^#\(.*\)/s|<([a-zA-Z0-9]+)\\s+.*id=.?\1.*>.*<\/\\1>||g/g;s/^\.\(.*\)/s|<([a-zA-Z0-9]+)\\s+.*class=.?\1.*>.*<\/\\1>||g/g;s/^a\[\(.*\)\]/s|<a.*\1.*>.*<\/a>||g/g;s/^\([a-zA-Z0-9]*\)\.\(.*\)\[.*\]\[.*\]*/s|<\1.*class=.?\2.*>.*<\/\1>||g/g;s/^\([a-zA-Z0-9]*\)#\(.*\):.*[:[^:]]*[^:]*/s|<\1.*id=.?\2.*>.*<\/\1>||g/g;s/^\([a-zA-Z0-9]*\)#\(.*\)/s|<\1.*id=.?\2.*>.*<\/\1>||g/g;s/^\[\([a-zA-Z]*\).=\(.*\)\]/s|\1^=\2>||g/g;s/\^/[\/\&:\?=_]/g;s/\.\([a-zA-Z0-9]\)/\\.\1/g' ${file} >> ${filterfile}
-		debug "... filterfile created - adding filterfile to actionfile ..." 1
+		debug "... creating whitlistfile for urls ..." 1
+		# whitelist of urls
+		echo "{ -block }" > ${whitefile}
+		# whitelist of images for urls
+		debug "... creating whitlistfile of images for urls ..." 1
+		echo "{ -block +handle-as-image }" > ${whiteimgfile}
+		debug "... processing listfile ..." 0
+
+		# convert AdblockPlus list to Privoxy list
+		while read line
+		do
+	#		debug "total line: $line" 2
+			if [[ ${line:0:1} = ! ]] || [[ $line =~ ^[Adblock ]]
+			then
+				continue
+			fi
+			# set filter for html elements
+			if [[ ${line:0:1} = "#" ]]
+			then
+				pfile="$filterfile"
+				wline="${line:2}"
+				if [[ ${wline:0:1} = \# ]]
+				then
+					wline="${wline:1}"
+					pline="<s|<([a-zA-Z0-9]+)\s+.*id=.?${wline/[*/}.*>.*<\/\1>||g"
+				elif [[ ${wline:0:1} = \. ]]
+				then
+					pline="s|<([a-zA-Z0-9]+)\s+.*class=.?${wline:1}.*>.*<\/\1>||g"
+				elif [[ ${wline:0:2} = a\[ ]]
+				then
+					pline="s|<a.*${wline:2:${#wline}-1}.*>.*<\/a>||g"
+				elif [[ ${wline} =~ ^[a-zA-Z0-9]*.* ]]
+				then
+					local tag="${wline/[#.]*/}"
+					wline="${wline:${#tag}}"
+					if [[ ${wline:0:1} = \# ]]
+					then
+						wline="${wline:1}"
+						pline="<s|<$tag\s+.*id=.?${wline/[*/}.*>.*<\/$tag>||g"
+					elif [[ ${wline:0:1} = \. ]]
+					then
+						pline="s|<$tag\s+.*class=.?${wline:1}.*>.*<\/$tag>||g"
+					fi
+					unset tag
+				elif [[ ${wline:0:1} = \[ ]]
+				then
+					local firstpart="${wline/=*/}"
+					local secpart="${wline/*=/}"
+					pline="s|${firstpart:1}=${secpart:0:${#secpart}-1}.*>||g"
+				fi
+				if [[ -n "${pline}" ]]
+				then
+					pline="$(escapeLine "$pline")"
+				fi
+			# whitelist of urls
+			elif [[ ${line:0:2} = @@ ]]
+			then
+				pfile="$whitefile"
+				wline="${line:2}"
+				if [[ $line =~ \$.*image ]]
+				then
+					wline="${wline//\$*/}"
+					pfile="$whiteimgfile"
+				fi
+				if [[ $wline =~ [\$\#] ]]
+				then
+					continue
+				fi
+				if [[ -n "${wline}" ]]
+				then
+					pline="$(escapeLine "$wline")"
+				fi
+				if [[ $pline =~ \| ]]
+				then
+					continue
+				fi
+			elif [[ ! $line =~ [\$\#] ]]
+			then
+				pfile="$actionfile"
+				wline="$line"
+				if [[ -n "${wline}" ]]
+				then
+					pline="$(escapeLine "$wline")"
+				fi
+			fi
+			[[ -n "$pfile" ]] && echo "$pline" >> "$pfile"
+	#		debug "written line: $pline" 2
+	#		debug "written file: $pfile" 2
+			unset pline wline pfile
+		done < "${file}"
+
+		debug "... adding filterfile to actionfile ..." 1
 		echo "{ +filter{${list}} }" >> ${actionfile}
 		echo "*" >> ${actionfile}
-		debug "... filterfile added ..." 1
+		debug "... adding whitelist to actionfile ..." 1
+		cat "$whitefile" >> "$actionfile"
+		debug "... adding image handler to actionfile ..." 1
+		cat "$whiteimgfile" >> "$actionfile"
+		debug "... created actionfile for ${list}." 1
+
+		debug "... done." 0
+
 #		domains=$(sed ${sedoptions} '/^#/d;/#/!d;s/,~/,\*/g;s/~/;:\*/g;s/^\([a-zA-Z]\)/;:\1/g' ${file})
 #		[ -n "${domains}" ] && debug "... creating domainbased filterfiles ..." 1
 #		debug "Found Domains: ${domains}." 2
@@ -122,16 +235,7 @@ function main()
 #		done
 #		IFS=${ifs}
 #		debug "... all domainbased filterfiles created ..." 1
-		debug "... creating and adding whitlist for urls ..." 1
-		# whitelist of urls
-		echo "{ -block }" >> ${actionfile}
-		sed '/^@@.*/!d;s/^@@//g;/\$.*/d;/#/d;s/\./\\./g;s/\?/\\?/g;s/\*/.*/g;s/(/\\(/g;s/)/\\)/g;s/\[/\\[/g;s/\]/\\]/g;s/\^/[\/\&:\?=_]/g;s/^||/\./g;s/^|/^/g;s/|$/\$/g;/|/d' ${file} >> ${actionfile}
-		debug "... created and added whitelist - creating and adding image handler ..." 1
-		# whitelist of image urls
-		echo "{ -block +handle-as-image }" >> ${actionfile}
-		sed '/^@@.*/!d;s/^@@//g;/\$.*image.*/!d;s/\$.*image.*//g;/#/d;s/\./\\./g;s/\?/\\?/g;s/\*/.*/g;s/(/\\(/g;s/)/\\)/g;s/\[/\\[/g;s/\]/\\]/g;s/\^/[\/\&:\?=_]/g;s/^||/\./g;s/^|/^/g;s/|$/\$/g;/|/d' ${file} >> ${actionfile}
-		debug "... created and added image handler ..." 1
-		debug "... created actionfile for ${list}." 1
+
 	
 		# install Privoxy actionsfile
 		cp ${cpoptions} ${actionfile} ${CONFDIR}
