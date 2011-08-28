@@ -52,18 +52,23 @@ TMPNAME="$(basename ${0%.*})"
 CONFIGDIR="${XDG_CONFIG_HOME}/${TMPNAME}"
 PNAMECOLOR_PRE="\e[0;31m"
 PNAMECOLOR_POS="\e[0m"
-
-if ! which wget sed grep bash >/dev/null 2>&1
-then
-	echo "One of the following Dependencies is missing: wget, sed, grep, bash. Exit"
-	exit 1
-fi
+DEPENDS=( sed grep bash wget )
 
 ######################################################################
 #
 #                  Helper functions
 #
 ######################################################################
+
+# Check for dependencies of this script
+for dep in ${DEPENDS[@]}
+do
+	if ! which ${dep} >/dev/null 2>&1
+	then
+		echo "One of the following Dependencies is missing: ${dep}. Exit"
+		exit 1
+	fi
+done
 
 function debug()
 {
