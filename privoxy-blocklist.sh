@@ -88,7 +88,7 @@ function main()
 		wget -t 3 --no-check-certificate -O ${file} ${url} >${TMPDIR}/wget-${url//\//#}.log 2>&1
 		debug "$(cat ${TMPDIR}/wget-${url//\//#}.log)" 2
 		debug ".. downloading done." 0
-		[ "$(grep -E '^\[Adblock.*\]$' ${file})" == "" ] && echo "The list recieved from ${url} isn't an AdblockPlus list. Skipped" && continue
+		[ "$(grep -E '^.*\[Adblock.*\].*$' ${file})" == "" ] && echo "The list recieved from ${url} isn't an AdblockPlus list. Skipped" && continue
 	
 		# convert AdblockPlus list to Privoxy list
 		# blacklist of urls
