@@ -47,9 +47,6 @@ PKGBUILD=PKGBUILD
 #
 ######################################################################
 
-LOCKFILE="${TMPDIR}/${PROFILE}.lock"
-TMPNAME="$(basename ${0%.*})"
-CONFIGDIR="${XDG_CONFIG_HOME}/${TMPNAME}"
 PNAMECOLOR_PRE="\e[0;31m"
 PNAMECOLOR_POS="\e[0m"
 DEPENDS=( sed grep bash wget )
@@ -740,6 +737,10 @@ done
 [ -z "${action}" ] && usage${mode} && [ ${PDBG} -eq 0 ] && PDBG=-1 && exit 1
 
 debug "action: ${action}" 3
+
+LOCKFILE="${TMPDIR}/${PROFILE}.lock"
+TMPNAME="$(basename ${0%.*})"
+CONFIGDIR="${XDG_CONFIG_HOME}/${TMPNAME}"
 
 eval ${action}
 
