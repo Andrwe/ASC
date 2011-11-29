@@ -207,9 +207,9 @@ source "${SCRIPTCONF}"
 [[ -r "${INIT_CONF}" ]] && source "${INIT_CONF}"
 
 # check whether needed variables are set
-[[ -z "${PRIVOXY_CONF}" ]] echo "\$PRIVOXY_CONF isn't set please either provice a valid initscript config or set it in ${SCRIPTCONF} ." >&2 && exit 1
-[[ -z "${PRIVOXY_USER}" ]] echo "\$PRIVOXY_USER isn't set please either provice a valid initscript config or set it in ${SCRIPTCONF} ." >&2 && exit 1
-[[ -z "${PRIVOXY_GROUP}" ]] echo "\$PRIVOXY_GROUP isn't set please either provice a valid initscript config or set it in ${SCRIPTCONF} ." >&2 && exit 1
+[[ -z "${PRIVOXY_CONF}" ]] && echo "\$PRIVOXY_CONF isn't set please either provice a valid initscript config or set it in ${SCRIPTCONF} ." >&2 && exit 1
+[[ -z "${PRIVOXY_USER}" ]] && echo "\$PRIVOXY_USER isn't set please either provice a valid initscript config or set it in ${SCRIPTCONF} ." >&2 && exit 1
+[[ -z "${PRIVOXY_GROUP}" ]] && echo "\$PRIVOXY_GROUP isn't set please either provice a valid initscript config or set it in ${SCRIPTCONF} ." >&2 && exit 1
 
 # set command to be run on exit
 [ ${DBG} -le 2 ] && trap "rm -fr ${TMPDIR};exit" INT TERM EXIT
