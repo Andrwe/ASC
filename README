@@ -14,3 +14,8 @@ Description of functions used in makerepopkg.sh
 __privoxy-blocklist.sh__
 
 Script for converting AdBlock Plus lists to privoxy lists.
+
+<<bsf>>
+
+(Bash-Scripting-Framework)
+Framework providing many core functions which are used in many of my scripts.
