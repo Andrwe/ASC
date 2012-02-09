@@ -24,15 +24,38 @@
 #                     wget (auto-nocheck)
 #                     module based include
 #                     dependency checking
-#                     trap
+#                     trap (trapstart, trapstop, Parameter: "command","signals")
 #                     escaping
 #                     comments
+#                     usage (-h, -?)
+#                     help-module (longhelp, shorthelp)
+#                     parameter function (:-seperated list of parameters for module eg. log:syslog:serveraddress:port; - & :: = skip option)
+#                     PID-management
+#                  - rules:
+#                     Knowledge (available functions, parameters, ...) about module has only the module itself
 #
 ######################################################################
 
 COREPATH="$(readlink -f $0)"
 BSFPATH="${COREPATH%/*}"
 CONFIGPATH="${BSFPATH}/bsf.config"
+
+while getopts ":h:?:" opt
+do
+  case "${opt}" in
+    "h")
+      if [ -z "${OPTARGS}" ]
+      then
+        for module in "${BSFPATH}/"*
+        do
+          echo ${module}
+        done
+      else
+      fi
+    ;;
+  esac
+done
+
 
 for module in $@
 do

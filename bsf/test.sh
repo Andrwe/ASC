@@ -1,4 +1,4 @@
-source core.sh debug
+source bsf.sh debug
 
 echo ${BSFPATH}
 echo $bla
