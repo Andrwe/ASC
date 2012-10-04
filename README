@@ -12,3 +12,29 @@ __makerepopkg.header__
 
 Description of functions used in makerepopkg.sh
 
+__makerepochroot.sh__
+
+Create clean chroot environment for Arch Linux like configured in files in repo-conf.
+
+__mouse.sh__
+
+Script to control mouse movements and clicks without mouse input devices.
+Intended to be bound to keys which enables mouse control via keyboard.
+Possible movements:
+ left, right, up, down (5px)
+ jleft, jright, jup, jdown (20px)
+ lclick, rclick (1 click)
+ wup, wdown [wheel up/down] (5 clicks)
+
+__awk-music.sh__
+
+Play music created by cli command awk.
+
+__ftpusers.sh__
+
+Change group of user given through socket.
+Used to change group of ftp users who successfully changed there password after first login through ssh so these users are bound to sftp by the new group.
+
+__createftpuser,sh__
+
+Create user for sftp.
