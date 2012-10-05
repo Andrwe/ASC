@@ -1,6 +1,7 @@
 #!/bin/bash
 
 confdir="$(dirname $(readlink -f $0))/repo-conf/"
+mirrorurl="http://www.archlinux.org/mirrorlist/?country=DE&protocol=http&ip_version=4&use_mirror_status=on"
 
 if [ ${#@} -ne 2 ]
 then
@@ -22,5 +23,7 @@ do
 	echo
 	echo "Creating chroot for ${arch}"
 	echo
+	sudo mv /etc/pacman.d/mirrorlist{,_chrootbkp} && wget -q -O - "${mirrorurl}" | sudo bash -c "sed 's/^#//g' > /etc/pacman.d/mirrorlist"
 	mkchroot "${arch}" "${2}/${arch}/root" || { echo "An error occured while creating chroot for ${arch}." >&2 && exit 1 ; }
+	sudo mv /etc/pacman.d/mirrorlist{_chrootbkp,}
 done
