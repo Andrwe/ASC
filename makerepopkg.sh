@@ -314,12 +314,18 @@ function checkDepend()
 	if [ ${PUSECHROOT} -eq 0 ]
 	then
 		pacman -T "${dep}" >/dev/null && debug "used: pacman -T ${dep}\nError-code: $?" 2 && return 5
+		debug "used: pacman -T ${dep}\nError-code: $?" 2 
 		pacman -Si "${dep}" >/dev/null 2>&1 && debug "used: pacman -Si ${dep}\nError-code: $?" 2 && return 6
+		debug "used: pacman -Si ${dep}\nError-code: $?" 2 
 		wget -q -t 3 --spider --no-check-certificate "https://aur.archlinux.org/packages/${dep}/${dep}.tar.gz" && debug "used: wget https://aur.archlinux.org/packages/${dep}/${dep}.tar.gz\nError-code: $?" 2 && return 7
+		debug "used: wget https://aur.archlinux.org/packages/${dep}/${dep}.tar.gz\nError-code: $?" 2
 	else
-		sudo mkarchroot -r "pacman -T ${dep%>*} >/dev/null" ${PCHROOT}/root >/dev/null && debug "used: pacman -T ${dep}\nError-code: $?" 2 && return 5
-		sudo mkarchroot -r "pacman -Si ${dep%>*} >/dev/null 2>&1" ${PCHROOT}/root >/dev/null && debug "used: pacman -Si ${dep}\nError-code: $?" 2 && return 6
+		sudo mkarchroot -r "bash -c \"pacman -T ${dep%>*} &>/dev/null\"" ${PCHROOT}/root && debug "used: pacman -T ${dep}\nError-code: $?" 2 && return 5
+		debug "used: pacman -T ${dep}\nError-code: $?" 2 
+		sudo mkarchroot -r "bash -c \"pacman -Si ${dep%>*} &>/dev/null\"" ${PCHROOT}/root && debug "used: pacman -Si ${dep}\nError-code: $?" 2 && return 6
+		debug "used: pacman -Si ${dep}\nError-code: $?" 2 
 		wget -q -t 3 --spider --no-check-certificate "https://aur.archlinux.org/packages/${dep}/${dep}.tar.gz" && debug "used: wget https://aur.archlinux.org/packages/${dep}/${dep}.tar.gz\nError-code: $?" 2 && return 7
+		debug "used: wget https://aur.archlinux.org/packages/${dep}/${dep}.tar.gz\nError-code: $?" 2
 	fi
 }
 
