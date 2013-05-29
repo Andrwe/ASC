@@ -746,7 +746,12 @@ debug "action: ${action}" 3
 
 LOCKFILE="${TMPDIR}/${PROFILE}.lock"
 TMPNAME="$(basename ${0%.*})"
-CONFIGDIR="${XDG_CONFIG_HOME}/${TMPNAME}"
+if [ -n "${XDG_CONFIG_HOME}" ]
+then
+	CONFIGDIR="${XDG_CONFIG_HOME}/${TMPNAME}"
+else
+	CONFIGDIR="/home/${USER}/.config/${TMPNAME}"
+fi
 
 eval ${action}
 
