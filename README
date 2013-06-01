@@ -35,6 +35,12 @@ __ftpusers.sh__
 Change group of user given through socket.
 Used to change group of ftp users who successfully changed there password after first login through ssh so these users are bound to sftp by the new group.
 
-__createftpuser,sh__
+__createftpuser.sh__
 
 Create user for sftp.
+
+__up_down_script.sh__
+
+Script for up/down options of openvpn.
+It reads options like DNS server and domain given by vpn-server and sets them in resolv.conf.
+It supports dhcpcd configurations using /etc/resolv.conf.head.
