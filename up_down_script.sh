@@ -1,6 +1,6 @@
 #!/bin/bash
 
-iface="$(ps ax | sed '/[0-9]\s*dhcpcd/!d;s/.*\s\([a-z0-9]*\)$/\1/')"
+iface="$(ps ax | sed '/[0-9]\s*[^ ]*dhcpcd/!d;s/.*\s\([a-z0-9]*\)$/\1/')"
 case "$script_type" in
 	"up")
 		for i in {0..10}
