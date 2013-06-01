@@ -156,6 +156,7 @@ Usage: $0 -B
   -p <profile>[,<profile>,...] : build package for given profiles
   -P <PKGBUILD>                : use given PKGBUILD for build
   -c                           : do not copy package into repository directory after build
+  -u                           : skip updating chroot
   -h                           : this help
 "
 }
@@ -500,9 +501,11 @@ function makePkg()
 			debug "makePkg() ${PCHROOT} ${PARCH} ${pname}" 1
 			if [ ${PDBG} -eq -1 ]
 			then
-				sudo ${plinux} makechrootpkg -u -c -r "${PCHROOT}" >/dev/null
+				${notupdate} || sudo ${plinux} makechrootpkg -u -c -r "${PCHROOT}" >/dev/null
+				${notupdate} && sudo ${plinux} makechrootpkg -c -r "${PCHROOT}" >/dev/null
 			else
-				sudo ${plinux} makechrootpkg -u -c -r "${PCHROOT}"
+				${notupdate} || sudo ${plinux} makechrootpkg -u -c -r "${PCHROOT}"
+				${notupdate} && sudo ${plinux} makechrootpkg -c -r "${PCHROOT}"
 			fi
 		fi
 		debug "Build done" 0
@@ -524,6 +527,7 @@ trap "cleanup" INT TERM EXIT
 mode=""
 action=""
 notcopy=false
+notupdate=false
 
 export ${config}
 
@@ -654,6 +658,9 @@ do
 						;;
 					"c")
 						notcopy=true
+						;;
+					"u")
+						notupdate=true
 						;;
 					":")
 						echo "${TMPNAME}: -${OPTARG} requires an argument" >&2
