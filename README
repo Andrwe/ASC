@@ -44,3 +44,8 @@ __up_down_script.sh__
 Script for up/down options of openvpn.
 It reads options like DNS server and domain given by vpn-server and sets them in resolv.conf.
 It supports dhcpcd configurations using /etc/resolv.conf.head.
+
+
+__getMaps.sh__
+
+Download and extract maps from openfietsmap.nl for europe.
