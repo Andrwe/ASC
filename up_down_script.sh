@@ -17,7 +17,10 @@ case "$script_type" in
 		done
 		if [ -n "${iface}" ]
 		then
-			dhcpcd -g "${iface}"
+			for e in ${iface}
+			do
+				dhcpcd -g "${e}"
+			done
 		else
 			[ -e /etc/resolv.conf.bkp ] || mv /etc/resolv.conf /etc/resolv.conf.bkp
 			cp /etc/resolv.conf.head /etc/resolv.conf
@@ -26,7 +29,7 @@ case "$script_type" in
 	"down")
 		rm -f /etc/resolv.conf.head
 		[ -z "${iface}" ] && [ -e /etc/resolv.conf.bkp ] && mv /etc/resolv.conf.bkp /etc/resolv.conf
-		[ -n "${iface}" ] && dhcpcd -g "${iface}"
+		[ -n "${iface}" ] && for e in ${iface}; do dhcpcd -g "${e}"; done
 	;;
 esac
 
