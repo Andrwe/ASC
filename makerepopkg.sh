@@ -321,9 +321,9 @@ function checkDepend()
 		wget -q -t 3 --spider --no-check-certificate "https://aur.archlinux.org/packages/${dep}/${dep}.tar.gz" && debug "used: wget https://aur.archlinux.org/packages/${dep}/${dep}.tar.gz\nError-code: $?" 2 && return 7
 		debug "used: wget https://aur.archlinux.org/packages/${dep}/${dep}.tar.gz\nError-code: $?" 2
 	else
-		sudo mkarchroot -r "bash -c \"pacman -T ${dep%>*} &>/dev/null\"" ${PCHROOT}/root && debug "used: pacman -T ${dep}\nError-code: $?" 2 && return 5
+		sudo arch-nspawn "${PCHROOT}"/root bash -c "pacman -T ${dep%>*} &>/dev/null" && debug "used: pacman -T ${dep}\nError-code: $?" 2 && return 5
 		debug "used: pacman -T ${dep}\nError-code: $?" 2 
-		sudo mkarchroot -r "bash -c \"pacman -Si ${dep%>*} &>/dev/null\"" ${PCHROOT}/root && debug "used: pacman -Si ${dep}\nError-code: $?" 2 && return 6
+		sudo arch-nspawn "${PCHROOT}"/root bash -c "pacman -Si ${dep%>*} &>/dev/null" && debug "used: pacman -Si ${dep}\nError-code: $?" 2 && return 6
 		debug "used: pacman -Si ${dep}\nError-code: $?" 2 
 		wget -q -t 3 --spider --no-check-certificate "https://aur.archlinux.org/packages/${dep}/${dep}.tar.gz" && debug "used: wget https://aur.archlinux.org/packages/${dep}/${dep}.tar.gz\nError-code: $?" 2 && return 7
 		debug "used: wget https://aur.archlinux.org/packages/${dep}/${dep}.tar.gz\nError-code: $?" 2
