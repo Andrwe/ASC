@@ -312,6 +312,8 @@ function checkDepend()
 {
 	local dep="${1}"
 	debug "use chroot: ${PUSECHROOT}\ncheckDepends() ${dep}" 2
+	dep="${dep%>*}"
+	dep="${dep%<*}"
 	if [ ${PUSECHROOT} -eq 0 ]
 	then
 		pacman -T "${dep}" >/dev/null && debug "used: pacman -T ${dep}\nError-code: $?" 2 && return 5
@@ -321,9 +323,9 @@ function checkDepend()
 		wget -q -t 3 --spider --no-check-certificate "https://aur.archlinux.org/packages/${dep}/${dep}.tar.gz" && debug "used: wget https://aur.archlinux.org/packages/${dep}/${dep}.tar.gz\nError-code: $?" 2 && return 7
 		debug "used: wget https://aur.archlinux.org/packages/${dep}/${dep}.tar.gz\nError-code: $?" 2
 	else
-		sudo arch-nspawn "${PCHROOT}"/root bash -c "pacman -T ${dep%>*} &>/dev/null" && debug "used: pacman -T ${dep}\nError-code: $?" 2 && return 5
+		sudo arch-nspawn "${PCHROOT}"/root bash -c "pacman -T ${dep} &>/dev/null" && debug "used: pacman -T ${dep}\nError-code: $?" 2 && return 5
 		debug "used: pacman -T ${dep}\nError-code: $?" 2 
-		sudo arch-nspawn "${PCHROOT}"/root bash -c "pacman -Si ${dep%>*} &>/dev/null" && debug "used: pacman -Si ${dep}\nError-code: $?" 2 && return 6
+		sudo arch-nspawn "${PCHROOT}"/root bash -c "pacman -Si ${dep} &>/dev/null" && debug "used: pacman -Si ${dep}\nError-code: $?" 2 && return 6
 		debug "used: pacman -Si ${dep}\nError-code: $?" 2 
 		wget -q -t 3 --spider --no-check-certificate "https://aur.archlinux.org/packages/${dep}/${dep}.tar.gz" && debug "used: wget https://aur.archlinux.org/packages/${dep}/${dep}.tar.gz\nError-code: $?" 2 && return 7
 		debug "used: wget https://aur.archlinux.org/packages/${dep}/${dep}.tar.gz\nError-code: $?" 2
@@ -446,7 +448,10 @@ function makePkg()
 	[ "${PARCH}" == "x86_64" ] && plinux=linux64
 	
 	debug "Changing into PKGBUILD-directory ($(dirname ${PKGBUILD}))." 0
-	cd "$(dirname ${PKGBUILD})"
+	rundir="$PWD"
+	runpkgbuild="${PKGBUILD}"
+	cd "$(dirname "${PKGBUILD}")"
+	PKGBUILD="$(basename "${PKGBUILD}")"
 	source ${PKGBUILD}
 	if [[ ${arch[@]} =~ any ]] 
 	then
@@ -474,11 +479,11 @@ function makePkg()
 		case $? in
 			2)
 				debug "Some dependencies are only available through AUR, add them to a repository or install them first. Skip" -10
-				return
+				return 1
 				;;
 			3)
 				debug "Some dependencies have unknown status. Skip" -10
-				return
+				return 1
 				;;
 		esac
 		debug "Checking for old builds and delete them." 0
@@ -511,7 +516,8 @@ function makePkg()
 		debug "Build done" 0
 	fi
 	${notcopy} || copyPkg
-	cd - >/dev/null
+	PKGBUILD="${runpkgbuild}"
+	cd "${rundir}" >/dev/null
 }
 
 
@@ -761,9 +767,10 @@ else
 fi
 
 eval ${action}
+ret=$?
 
 debug "Last return-code: $?" 3
 
 cleanup
 trap - INT TERM EXIT
-exit 0
+exit $ret
