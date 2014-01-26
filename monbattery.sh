@@ -64,7 +64,7 @@ do
 	                	su "${user}" -c "/usr/local/bin/pulse_mixer.sh down"
 			done
 			sleep 3
-			su "$user" -c "mplayer /usr/share/sounds/freedesktop/stereo/alarm-clock-elapsed.oga" >/dev/null
+			su "$user" -c "mplayer /usr/share/sounds/freedesktop/stereo/alarm-clock-elapsed.oga" >/dev/null 2>&1
 			for i in {1..15}
 			do
 	                	su "${user}" -c "/usr/local/bin/pulse_mixer.sh up"
