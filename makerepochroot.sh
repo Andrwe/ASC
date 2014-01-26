@@ -18,7 +18,7 @@ for arch in ${1//,/ }
 do
 	[ -e "${confdir}/pacman-${arch}.conf" ] || { echo "pacman.conf for ${arch} doesn't exist." >&2 && exit 1 ; }
 	[ -e "${confdir}/makepkg-${arch}.conf" ] || { echo "makepkg.conf for ${arch} doesn't exist." >&2 && exit 1 ; }
-	[ -d "${2}/${arch}" ] || { echo "repo directory ${2}/${arch} for ${arch} doesn't exist." >&2 && exit 1 ; }
+	[ -d "${2}/${arch}" ] || { echo "repo directory ${2}/${arch} for ${arch} doesn't exist. Creating." >&2 && mkdir -p "${2}/${arch}" ; }
 	echo
 	echo
 	echo "Creating chroot for ${arch}"
