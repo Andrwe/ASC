@@ -49,3 +49,8 @@ It supports dhcpcd configurations using /etc/resolv.conf.head.
 __getMaps.sh__
 
 Download and extract maps from openfietsmap.nl for europe.
+
+
+__monbattery.sh__
+
+A simple monitor of battery which warns using sound and notifications and hibernates when current capacity is below off-value (10%)
