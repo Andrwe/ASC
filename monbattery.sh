@@ -28,7 +28,7 @@ do
 	sleep 20
 	[ "$(<"${battery_status_path}")" == "Discharging" ] || continue
 	perc=$(($(<"${energy_now_path}")*100/$(<"${energy_full_path}")))
-	notifyuser="$(ps aux | grep /usr/lib/notify-osd/notify-osd | cut -d' ' -f1)"
+	notifyuser="$(ps aux | grep /usr/lib/notify-osd/notify-osd | cut -d' ' -f1 | sort -u)"
 	if [ ${perc} -lt ${warn} -a ${perc} -gt ${crit} ]
 	then
 		for user in ${notifyuser}
@@ -53,7 +53,7 @@ do
 		do
 			su "$user" -c "notify-send -u critical -t 10000 -a monbattery \"Battery empty\" \"Now your battery is below ${off} (${perc}) I'm shutting down in 10 sec.\""
 	        done
-		pauser="$(ps aux | grep pulseaudio | grep -v grep | cut -d' ' -f1)"
+		pauser="$(ps aux | grep pulseaudio | grep -v grep | cut -d' ' -f1 | sort -u)"
 	        for user in ${pauser}
 	        do
 	                su "${user}" -c "/usr/local/bin/pulse_mixer.sh mute"
