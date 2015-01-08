@@ -13,7 +13,7 @@ function mkchroot()
 {
 	opt=""
 	grep -E "^\s*CacheDir" "${confdir}/pacman-${1}.conf" >/dev/null 2>&1 && opt="-c $(grep -E "^\s*CacheDir" "${confdir}/pacman-${1}.conf" | sed 's/[^=]*=\s*\([^ ]*\)\s*$/\1/g')"
-	sudo mkarchroot -C "${confdir}/pacman-${1}.conf" -M "${confdir}/makepkg-${1}.conf" "${opt}" "${2}" base base-devel sudo || return $?
+	sudo mkarchroot -C "${confdir}/pacman-${1}.conf" -M "${confdir}/makepkg-${1}.conf" "${opt}" "${2}" base-devel || return $?
 }
 
 for arch in ${1//,/ }
@@ -26,6 +26,6 @@ do
 	echo "Creating chroot for ${arch}"
 	echo
 	sudo mv /etc/pacman.d/mirrorlist{,_chrootbkp} && wget -q -O - "${mirrorurl}" | sudo bash -c "sed 's/^#//g' > /etc/pacman.d/mirrorlist"
-	mkchroot "${arch}" "${2}/${arch}/root" || { echo "An error occured while creating chroot for ${arch}. (return-code of mkarchroot: $?)" >&2 && exit 1 ; }
+	mkchroot "${arch}" "${2}/${arch}/root" # || { echo "An error occured while creating chroot for ${arch}. (return-code of mkarchroot: $?)" >&2 && exit 1 ; }
 	sudo mv /etc/pacman.d/mirrorlist{_chrootbkp,}
 done
