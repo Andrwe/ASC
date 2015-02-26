@@ -345,7 +345,7 @@ function listDepends()
 	echo -e "\nDependencies:\n"
 	for dep in ${depends[@]} ${makedepends[@]}
 	do
-		checkDepend "${dep}"
+		checkDepend "${dep}" >/dev/null 2>&1
 		debug "Status: $?" 2
 		case $? in
 			5)
