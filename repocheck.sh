@@ -46,9 +46,9 @@ while read repo pkg pacver state; do
     pacver_num="${pacver//[-._]/}"
     aurver_num="${aurver//[-._]/}"
     if [[ ${pacver_num} =~ ^[0-9]+$ ]] && [[ ${aurver_num} =~ ^[0-9]+$ ]]; then
-      [[ ${pacver_num##0} -lt ${aurver_num##0} ]] && echo "${repo} ${pkg} ${aurver} cur: ${pacver}"
+      [[ ${pacver_num##0} -lt ${aurver_num##0} ]] && echo "${repo} ${pkg} ${pacver} -> ${aurver}"
       continue
     fi
-    [[ "${pacver}" != "${aurver}" ]] && echo "${repo} ${pkg} ${aurver} cur: ${pacver}"
+    [[ "${pacver}" != "${aurver}" ]] && echo "${repo} ${pkg} ${pacver} -> ${aurver}"
   fi
 done <<<"$(pacman -Sl ${REPONAME})"
