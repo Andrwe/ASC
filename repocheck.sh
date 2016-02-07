@@ -22,7 +22,14 @@ BLACKLIST="ruby-.*"
 # command to get aur version of a package
 #  - has to return only version string
 #  - is later called using "AURVERCMD pkg"
-AURVERCMD="cower --format=%v -i"
+function AURVERCMD() {
+  local resp="$(wget -O- "https://aur.archlinux.org/rpc.php?type=info&arg=${1}" -q)"
+  if [[ $(echo "${resp}" | jshon -e 'resultcount' -u) -gt 0 ]]; then
+    echo "$(echo "${resp}" | jshon -e "results" -e "Version" -u)"
+  else
+    echo "aur_missing"
+  fi
+}
 
 # cleanup command for pkg db
 # for pkg in $(zcat andrwe.db.tar.gz | grep -a -A1 '%NAME%' | grep -v '%NAME%' | grep -v '\-\-' | sort -u);do ls "$pkg"* &>/dev/null || repo-remove andrwe.db.tar.gz "$pkg";done
@@ -38,7 +45,7 @@ export LANG=C
 while read repo pkg pacver state; do
   [[ ${pkg} =~ ${BLACKLIST} ]] && continue
   if ! [[ ${pkg} =~ .*-(git|svn|cvs|hg) ]]; then
-    aurver="$(${AURVERCMD} "${pkg}" 2>/dev/null)"
+    aurver="$(AURVERCMD "${pkg}" 2>/dev/null)"
     if [[ -z "${aurver}" ]]; then
       [[ DEBUG -gt 0 ]] && echo "no AUR version for ${pkg}"
       continue

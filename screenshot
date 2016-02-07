@@ -1,10 +1,12 @@
 #!/bin/bash
 
 server="$(zenity --entry)"
-if [ -n "$server" ]
-then
-	mkdir -p ${HOME}/screenshot/"$server"
-	
-	xwd | xwdtopnm | pnmtojpeg >${HOME}/screenshot/"$server"/screenshot-$$.jpg
-	#xwd -root -out ${HOME}/screenshot-$$ | xwdtopnm ${HOME}/screenshot-$$ | pnmtojpeg >${HOME}/screenshot/$server/screenshot-$$.jpg
-fi
+#if [ -n "$server" ]
+#then
+#	mkdir -p ${HOME}/screenshot/"$server"
+#	
+#	xwd | xwdtopnm | pnmtojpeg >${HOME}/screenshot/"$server"/screenshot-$$.jpg
+#	#xwd -root -out ${HOME}/screenshot-$$ | xwdtopnm ${HOME}/screenshot-$$ | pnmtojpeg >${HOME}/screenshot/$server/screenshot-$$.jpg
+#fi
+
+scrot -q 100 -s ~/screenshot/"${server}"
