@@ -40,13 +40,21 @@ do
 		for user in ${notifyuser}
 		do
 			su "$user" -c "notify-send -u critical -t 15000 -a monbattery \"Battery critical\" \"Hey, wake up your battery is below ${crit} (${perc}).\""
-			su "$user" -c "mplayer -ao pulse /usr/share/sounds/freedesktop/stereo/power-plug.oga" >/dev/null 2>&1
-			su "$user" -c "mplayer -ao pulse /usr/share/sounds/freedesktop/stereo/power-unplug.oga" >/dev/null 2>&1
-			su "$user" -c "mplayer -ao pulse /usr/share/sounds/freedesktop/stereo/power-plug.oga" >/dev/null 2>&1
-			su "$user" -c "mplayer -ao pulse /usr/share/sounds/freedesktop/stereo/power-unplug.oga" >/dev/null 2>&1
-			su "$user" -c "mplayer -ao pulse /usr/share/sounds/freedesktop/stereo/power-plug.oga" >/dev/null 2>&1
-			su "$user" -c "mplayer -ao pulse /usr/share/sounds/freedesktop/stereo/power-unplug.oga" >/dev/null 2>&1
 		done
+		pauser="$(ps aux | grep pulseaudio | grep -v grep | cut -d' ' -f1 | sort -u)"
+	        for user in ${pauser}
+	        do
+			for i in {1..15}
+			do
+	                	su "${user}" -c "/usr/local/bin/pulse_mixer.sh down"
+			done
+			sleep 3
+			su "$user" -c "mplayer /usr/share/sounds/freedesktop/stereo/alarm-clock-elapsed.oga" >/dev/null 2>&1
+			for i in {1..15}
+			do
+	                	su "${user}" -c "/usr/local/bin/pulse_mixer.sh up"
+			done
+	        done
 	elif [ ${perc} -le ${off} ]
 	then
 		for user in ${notifyuser}
