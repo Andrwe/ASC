@@ -22,12 +22,14 @@ BLACKLIST="ruby-.*"
 # command to get aur version of a package
 #  - has to return only version string
 #  - is later called using "AURVERCMD pkg"
+SKIP_MISS=false
+[[ "${1}" == "-s" ]] && SKIP_MISS=true && shift
 function AURVERCMD() {
   local resp="$(wget -O- "https://aur.archlinux.org/rpc.php?type=info&arg=${1}" -q)"
   if [[ $(echo "${resp}" | jshon -e 'resultcount' -u) -gt 0 ]]; then
     echo "$(echo "${resp}" | jshon -e "results" -e "Version" -u)"
   else
-    echo "aur_missing"
+    ${SKIP_MISS} || echo "aur_missing"
   fi
 }
 
@@ -41,6 +43,7 @@ function AURVERCMD() {
 ######################################################################
 
 export LANG=C
+[[ -n "${@}" ]] && REPONAME="${@}"
 
 while read repo pkg pacver state; do
   [[ ${pkg} =~ ${BLACKLIST} ]] && continue
