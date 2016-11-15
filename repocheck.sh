@@ -49,14 +49,17 @@ while read repo pkg pacver state; do
   [[ ${pkg} =~ ${BLACKLIST} ]] && continue
   if ! [[ ${pkg} =~ .*-(git|svn|cvs|hg) ]]; then
     aurver="$(AURVERCMD "${pkg}" 2>/dev/null)"
-    if [[ -z "${aurver}" ]]; then
-      [[ DEBUG -gt 0 ]] && echo "no AUR version for ${pkg}"
-      continue
-    fi
+    [[ -z "${aurver}" ]] && continue
     pacver_num="${pacver//[-._]/}"
     aurver_num="${aurver//[-._]/}"
+    [[ ${DEBUG} -gt 0 ]] && echo "${repo} ${pkg} ${pacver} ${aurver}"
     if [[ ${pacver_num} =~ ^[0-9]+$ ]] && [[ ${aurver_num} =~ ^[0-9]+$ ]]; then
-      [[ ${pacver_num##0} -lt ${aurver_num##0} ]] && echo "${repo} ${pkg} ${pacver} -> ${aurver}"
+      [[ ${pacver_num##0} -lt ${aurver_num##0} ]] && echo "${repo} ${pkg} ${pacver} -> ${aurver}" && continue
+      pacver_array=( ${pacver//[-._]/ } )
+      aurver_array=( ${aurver//[-._]/ } )
+      for ((i=0; i<${#pacver_array[@]}; i++)); do
+        [[ ${pacver_array[$i]##0} -lt ${aurver_array[$i]##0} ]] && echo "${repo} ${pkg} ${pacver} -> ${aurver}" && break
+      done
       continue
     fi
     [[ "${pacver}" != "${aurver}" ]] && echo "${repo} ${pkg} ${pacver} -> ${aurver}"
