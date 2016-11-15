@@ -9,4 +9,4 @@ server="$(zenity --entry)"
 #	#xwd -root -out ${HOME}/screenshot-$$ | xwdtopnm ${HOME}/screenshot-$$ | pnmtojpeg >${HOME}/screenshot/$server/screenshot-$$.jpg
 #fi
 
-scrot -q 100 -s ~/screenshot/"${server}"
+scrot -q 100 -s ~/screenshot/"${server}-%Y-%m-%d.png"
