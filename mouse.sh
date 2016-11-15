@@ -44,9 +44,9 @@ case ${1} in
 		xdotool click 3
 	;;
 	wdown )
-		xdotool click --repeat 5 5
+		xdotool click --repeat 5 4
 	;;
 	wup )
-		xdotool click --repeat 5 4
+		xdotool click --repeat 5 5
 	;;
 esac
