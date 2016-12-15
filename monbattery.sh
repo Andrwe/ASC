@@ -13,15 +13,20 @@ then
 fi
 echo $$ >/tmp/monbattery.pid
 
-energy_full_path="/sys/class/power_supply/BAT1/energy_full"
-energy_now_path="/sys/class/power_supply/BAT1/energy_now"
-battery_status_path="/sys/class/power_supply/BAT1/status"
 warn=20
 crit=14
 off=10
+bat="BAT1"
 
-[ -r "${energy_full_path}" ] || { echo "The path specified for energy_full doesn't exist." && exit 1 ; }
-[ -r "${energy_now_path}" ] || { echo "The path specified for energy_now doesn't exist." && exit 1 ; }
+[[ -e "/etc/monbattery.conf" ]] && source "/etc/monbattery.conf" && echo "loaded config file '/etc/monbattery.conf'"
+[[ -e "/usr/local/etc/monbattery.conf" ]] && source "/usr/local/etc/monbattery.conf" && echo "loaded config file '/usr/local/etc/monbattery.conf'"
+
+energy_full_path="/sys/class/power_supply/${bat}/energy_full"
+energy_now_path="/sys/class/power_supply/${bat}/energy_now"
+battery_status_path="/sys/class/power_supply/${bat}/status"
+
+[ -r "${energy_full_path}" ] || { echo "The path specified for energy_full (${energy_full_path}) doesn't exist." && exit 1 ; }
+[ -r "${energy_now_path}" ] || { echo "The path specified for energy_now (${energy_now_path}) doesn't exist." && exit 1 ; }
 
 while true
 do
