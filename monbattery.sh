@@ -28,12 +28,31 @@ battery_status_path="/sys/class/power_supply/${bat}/status"
 [ -r "${energy_full_path}" ] || { echo "The path specified for energy_full (${energy_full_path}) doesn't exist." && exit 1 ; }
 [ -r "${energy_now_path}" ] || { echo "The path specified for energy_now (${energy_now_path}) doesn't exist." && exit 1 ; }
 
+function check_tpacpi() {
+	battery="${1}"
+	if state="$(tpacpi-bat -g FD "${battery}" 2>/dev/null)"; then
+		stperc="$(tpacpi-bat -g ST "${battery}" | cut -d' ' -f1)"
+		spperc="$(tpacpi-bat -g SP "${battery}" | cut -d' ' -f1)"
+		if [ ${perc} -le ${stperc} -a "${state}" == "yes" ]; then
+			tpacpi-bat -s FD "${battery}" 0
+		fi
+		if [ ${perc} -ge ${spperc} -a "${state}" == "no" ]; then
+			tpacpi-bat -s FD "${battery}" 1
+		fi
+	fi
+}
+
 while true
 do
 	sleep 20
 	[ "$(<"${battery_status_path}")" == "Discharging" ] || continue
 	perc=$(($(<"${energy_now_path}")*100/$(<"${energy_full_path}")))
 	notifyuser="$(ps aux | grep /usr/lib/notify-osd/notify-osd | cut -d' ' -f1 | sort -u)"
+	# check for thinkpad battery management command & set discharge state (see https://github.com/teleshoes/tpacpi-bat)
+	if which tpacpi-bat &> /dev/null; then
+		check_tpacpi 1
+		check_tpacpi 2
+	fi
 	if [ ${perc} -lt ${warn} -a ${perc} -gt ${crit} ]
 	then
 		for user in ${notifyuser}
