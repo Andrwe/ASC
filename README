@@ -54,3 +54,8 @@ Download and extract maps from openfietsmap.nl for europe.
 __monbattery.sh__
 
 A simple monitor of battery which warns using sound and notifications and hibernates when current capacity is below off-value (10%)
+
+
+__virt-serial.sh__
+
+Manage serial connections over TCP.
