@@ -16,6 +16,8 @@ echo $$ >/tmp/monbattery.pid
 warn=20
 crit=14
 off=10
+min=50
+max=85
 bat="BAT1"
 
 [[ -e "/etc/monbattery.conf" ]] && source "/etc/monbattery.conf" && echo "loaded config file '/etc/monbattery.conf'"
@@ -33,10 +35,10 @@ function check_tpacpi() {
 	if state="$(tpacpi-bat -g FD "${battery}" 2>/dev/null)"; then
 		stperc="$(tpacpi-bat -g ST "${battery}" | cut -d' ' -f1)"
 		spperc="$(tpacpi-bat -g SP "${battery}" | cut -d' ' -f1)"
-		if [ ${perc} -le ${stperc} -a "${state}" == "yes" ]; then
+		if [ ${perc} -le ${min} -a "${state}" == "yes" ]; then
 			tpacpi-bat -s FD "${battery}" 0
 		fi
-		if [ ${perc} -ge ${spperc} -a "${state}" == "no" ]; then
+		if [ ${perc} -ge ${max} -a "${state}" == "no" ]; then
 			tpacpi-bat -s FD "${battery}" 1
 		fi
 	fi
