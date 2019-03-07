@@ -8,5 +8,8 @@ server="$(zenity --entry)"
 #	xwd | xwdtopnm | pnmtojpeg >${HOME}/screenshot/"$server"/screenshot-$$.jpg
 #	#xwd -root -out ${HOME}/screenshot-$$ | xwdtopnm ${HOME}/screenshot-$$ | pnmtojpeg >${HOME}/screenshot/$server/screenshot-$$.jpg
 #fi
-
-scrot -q 100 -s ~/screenshot/"${server}-%Y-%m-%d.png"
+dir="$(dirname "${server}")"
+file="$(basename "${server}")"
+echo "${dir} : ${file}"
+mkdir -p ~/screenshot/"${dir}"
+scrot -q 100 -s ~/screenshot/"${dir}"/"${file}-%Y-%m-%d_%H-%M.png"
